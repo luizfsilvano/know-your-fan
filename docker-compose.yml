@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: know_your_fan_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: know_your_fan
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - know-your-fan-network
+
+  backend:
+    build: ./backend
+    container_name: know_your_fan_backend
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/know_your_fan
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - know-your-fan-network
+
+volumes:
+  postgres_data:
+
+networks:
+  know-your-fan-network:
