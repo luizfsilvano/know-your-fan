@@ -34,7 +34,6 @@ public class AuthService {
         LocalDateTime now = LocalDateTime.now();
 
         User user = User.builder()
-                .id(id)
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(encodedPassword)
