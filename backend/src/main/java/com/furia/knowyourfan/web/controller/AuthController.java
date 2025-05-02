@@ -27,8 +27,7 @@ public class AuthController {
     @PostMapping("/signin")
     public AuthResponse signin(@RequestBody @Valid SigninRequest request)
     {
-        // TODO: Call service to authenticate user
-        return null;
+        return authService.authenticateUser(request);
     }
 
 }
