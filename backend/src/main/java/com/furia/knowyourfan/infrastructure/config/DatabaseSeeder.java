@@ -5,6 +5,8 @@ import com.furia.knowyourfan.domain.repository.StreamerLiveStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import com.furia.knowyourfan.domain.model.FuriaEvent;
+import com.furia.knowyourfan.domain.repository.FuriaEventRepository;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DatabaseSeeder {
 
+    private final FuriaEventRepository furiaEventRepository;
     private final StreamerLiveStatusRepository repository;
 
     @Bean
@@ -51,6 +54,37 @@ public class DatabaseSeeder {
 
                 repository.saveAll(streamers);
                 System.out.println("✅ Streamers seeded!");
+            }
+        };
+    }
+
+    @Bean
+    public CommandLineRunner seedEvents() {
+        return args -> {
+            if (furiaEventRepository.count() == 0) {
+                List<FuriaEvent> events = List.of(
+                        FuriaEvent.builder()
+                                .title("IEM Dallas – FURIA vs MIBR")
+                                .dateTime(LocalDateTime.now().plusDays(1).withHour(18).withMinute(0))
+                                .location("Online")
+                                .description("Primeira rodada do IEM Dallas. Acompanhe no canal da ESL.")
+                                .build(),
+                        FuriaEvent.builder()
+                                .title("Twitch Rivals com FURIA Academy")
+                                .dateTime(LocalDateTime.now().plusDays(4).withHour(20).withMinute(30))
+                                .location("Twitch")
+                                .description("Participação especial da FURIA Academy no Twitch Rivals.")
+                                .build(),
+                        FuriaEvent.builder()
+                                .title("CS2 Qualifier Open Bracket")
+                                .dateTime(LocalDateTime.now().plusDays(10).withHour(15).withMinute(0))
+                                .location("Presencial - São Paulo")
+                                .description("Etapa classificatória para torneio regional de CS2.")
+                                .build()
+                );
+
+                furiaEventRepository.saveAll(events);
+                System.out.println("✅ FURIA events seeded!");
             }
         };
     }
