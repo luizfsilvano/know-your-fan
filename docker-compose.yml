@@ -4,10 +4,6 @@ services:
     container_name: know_your_fan_db
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: know_your_fan
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -18,13 +14,8 @@ services:
     container_name: know_your_fan_backend
     depends_on:
       - postgres
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/know_your_fan
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - APP_PROFILE=dev
-      - JWT_SECRET=my-super-secret-key-must-be-at-least-32-characters
-      - JWT_EXPIRATION=86400000
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     networks:
