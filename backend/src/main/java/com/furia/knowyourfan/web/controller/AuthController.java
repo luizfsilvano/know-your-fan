@@ -21,15 +21,13 @@ public class AuthController {
     @PostMapping("/signup")
     public AuthResponse signup(@RequestBody @Valid SignupRequest request)
     {
-        // TODO: Call service to register user
-        return null;
+        return authService.registerUser(request);
     }
 
     @PostMapping("/signin")
     public AuthResponse signin(@RequestBody @Valid SigninRequest request)
     {
-        // TODO: Call service to authenticate user
-        return null;
+        return authService.authenticateUser(request);
     }
 
 }
