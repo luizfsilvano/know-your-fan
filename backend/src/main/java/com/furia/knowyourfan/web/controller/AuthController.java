@@ -21,8 +21,7 @@ public class AuthController {
     @PostMapping("/signup")
     public AuthResponse signup(@RequestBody @Valid SignupRequest request)
     {
-        // TODO: Call service to register user
-        return null;
+        return authService.registerUser(request);
     }
 
     @PostMapping("/signin")
