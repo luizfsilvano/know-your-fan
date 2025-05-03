@@ -19,22 +19,14 @@ public class FanProfileController {
 
     private final FanProfileService fanProfileService;
 
-
     @PostMapping("/generate")
-    public ResponseEntity<FanProfileResponse> generateFanProfile(@Valid @RequestBody FanProfileRequest request) {
+    public ResponseEntity<FanProfileResponse> generateFanProfile(
+            @Valid @RequestBody FanProfileRequest request) {
+
         FanProfile fanProfile = fanProfileService.createProfile(request);
-        FanProfileResponse response = new FanProfileResponse(
-                fanProfile.getId(),
-                fanProfile.getNickname(),
-                fanProfile.getPreferredPlatform(),
-                fanProfile.getFavoriteGenre(),
-                fanProfile.getPlayStyle(),
-                fanProfile.getFavoritePlayer(),
-                fanProfile.getFavoriteTeam(),
-                fanProfile.getGameHoursPerWeek(),
-                fanProfile.getProfileSummary(),
-                fanProfile.getCreatedAt()
-        );
+
+        FanProfileResponse response = fanProfileService.generateProfileResponse(fanProfile);
+
         return ResponseEntity.ok(response);
     }
 }

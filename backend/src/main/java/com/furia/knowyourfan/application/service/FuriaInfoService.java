@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +18,12 @@ public class FuriaInfoService {
     private final FuriaEventRepository furiaEventRepository;
 
     public String getStreamerLinkByName(String name) {
-        return streamerLiveStatusRepository.findByNameIgnoreCase(name)
-                .map(status -> "Stream do " + name + ": " + status.getLink())
-                .orElse("Nenhum link encontrado para o streamer " + name + ".");
+        Optional<String> link = streamerLiveStatusRepository.findLinkByNameIgnoreCase(name);
+        return link.orElse("Nenhum link encontrado para o streamer " + name + ".");
     }
 
     public String getUpcomingEvents() {
-        List<FuriaEvent> events = furiaEventRepository.findAllByDateTimeAfterOrderByDateTimeAsc(LocalDateTime.now());
+        List<FuriaEvent> events = furiaEventRepository.findUpcomingEvents(LocalDateTime.now());
 
         if (events.isEmpty()) {
             return "Não há eventos futuros cadastrados para a FURIA.";
@@ -35,13 +35,7 @@ public class FuriaInfoService {
                     .append(event.getTitle())
                     .append(" em ")
                     .append(event.getDateTime())
-                    .append(" (")
-                    .append(event.getLocation() != null ? event.getLocation() : "local não informado")
-                    .append(")\n");
-
-            if (event.getDescription() != null && !event.getDescription().isBlank()) {
-                builder.append("  ").append(event.getDescription()).append("\n");
-            }
+                    .append("\n");
         }
 
         return builder.toString();

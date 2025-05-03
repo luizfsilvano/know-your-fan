@@ -3,26 +3,28 @@ package com.furia.knowyourfan.domain.model;
 import com.furia.knowyourfan.domain.model.enums.GameGenre;
 import com.furia.knowyourfan.domain.model.enums.Platform;
 import com.furia.knowyourfan.domain.model.enums.PlayStyle;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@NoArgsConstructor
 public class FanProfile {
 
-    private final UUID id;
-    private final String nickname;
-    private final Platform preferredPlatform;
-    private final GameGenre favoriteGenre;
-    private final PlayStyle playStyle;
-    private final String favoritePlayer;
-    private final String favoriteTeam;
-    private final String gameHoursPerWeek;
-    private final String profileSummary;
-    private final LocalDateTime createdAt;
+    private UUID id;
+    private String nickname;
+    private Platform preferredPlatform;
+    private GameGenre favoriteGenre;
+    private PlayStyle playStyle;
+    private String favoritePlayer;
+    private String favoriteTeam;
+    private String gameHoursPerWeek;
+    @Setter
+    private String profileSummary;
+    private LocalDateTime createdAt;
 
     public static FanProfile create(
             String nickname,
@@ -32,19 +34,21 @@ public class FanProfile {
             String favoritePlayer,
             String favoriteTeam,
             String gameHoursPerWeek,
-            String profileSummary
-    ) {
-        return new FanProfile(
-                UUID.randomUUID(),
-                nickname,
-                preferredPlatform,
-                favoriteGenre,
-                playStyle,
-                favoritePlayer,
-                favoriteTeam,
-                gameHoursPerWeek,
-                profileSummary,
-                LocalDateTime.now()
-        );
+            String profileSummary) {
+
+        FanProfile profile = new FanProfile();
+        profile.id = UUID.randomUUID();
+        profile.nickname = nickname;
+        profile.preferredPlatform = preferredPlatform;
+        profile.favoriteGenre = favoriteGenre;
+        profile.playStyle = playStyle;
+        profile.favoritePlayer = favoritePlayer;
+        profile.favoriteTeam = favoriteTeam;
+        profile.gameHoursPerWeek = gameHoursPerWeek;
+        profile.profileSummary = profileSummary;
+        profile.createdAt = LocalDateTime.now();
+
+        return profile;
     }
+
 }
