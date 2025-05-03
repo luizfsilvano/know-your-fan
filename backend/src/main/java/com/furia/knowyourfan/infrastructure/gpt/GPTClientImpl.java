@@ -1,64 +1,80 @@
 package com.furia.knowyourfan.infrastructure.gpt;
 
 import com.furia.knowyourfan.domain.gateway.GPTClient;
-import lombok.RequiredArgsConstructor;
+import com.furia.knowyourfan.domain.model.FanProfile;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.service.tool.HallucinatedToolNameStrategy;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
 
-@Component
-@RequiredArgsConstructor
+@Service
 public class GPTClientImpl implements GPTClient {
 
-    @Value("${openai.api.key}")
-    private String apiKey;
+    private final GptAssistant assistant;
+    private final FuriaTools furiaTools;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    public GPTClientImpl(@Value("${openai.api.key}") String apiKey, FuriaTools furiaTools) {
+        this.furiaTools = furiaTools;
+        this.assistant = AiServices.builder(GptAssistant.class)
+                .chatModel(OpenAiChatModel.builder()
+                        .apiKey(apiKey)
+                        .modelName("gpt-4o-mini-2024-07-18")
+                        .temperature(1.0)
+                        .timeout(Duration.ofSeconds(60))
+                        .logRequests(true)
+                        .logResponses(true)
+                        .build())
+                .tools(furiaTools)
+                .build();
+    }
+
+    @Override
+    public String generateFanProfileAnalysis(FanProfile fanProfile) {
+        String prompt = """
+Você é um assistente digital especializado em analisar e engajar fãs do time de esports FURIA.
+
+Ferramentas disponíveis que você pode usar:
+- getUpcomingEvents(): retorna uma lista de eventos futuros envolvendo a FURIA Esports.
+- getStreamerLinkByName(nome): retorna o link da transmissão ao vivo de um jogador da FURIA, caso esteja disponível.
+Use apenas essas ferramentas para obter dados externos.
+
+Abaixo estão as informações do perfil do fã. Com base nesses dados, gere um resumo personalizado que inclua:
+1. Observações e percepções sobre as preferências de jogo do fã.
+2. Ações sugeridas para aumentar o engajamento com os conteúdos e a comunidade da FURIA.
+3. Caso existam, liste **eventos futuros da FURIA** que o fã possa gostar.
+4. Caso aplicável, sugira **streamers que estejam ao vivo** no gênero de jogo favorito do fã.
+5. Se o fã tiver um jogador favorito, tente encontrar e sugerir o link da transmissão ao vivo desse jogador usando as ferramentas disponíveis.
+
+Perfil do fã:
+- Apelido: %s
+- Plataforma preferida: %s
+- Gênero de jogo favorito: %s
+- Estilo de jogo: %s
+- Jogador favorito: %s
+- Time favorito: %s
+- Horas de jogo por semana: %s
+""".formatted(
+                fanProfile.getNickname(),
+                fanProfile.getPreferredPlatform(),
+                fanProfile.getFavoriteGenre(),
+                fanProfile.getPlayStyle(),
+                fanProfile.getFavoritePlayer(),
+                fanProfile.getFavoriteTeam(),
+                fanProfile.getGameHoursPerWeek()
+        );
+
+        return assistant.chat(prompt);
+    }
 
     @Override
     public String generateProfile(String prompt) {
-        String url = "https://api.openai.com/v1/chat/completions";
+        return assistant.chat(prompt);
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
-
-        Map<String, Object> body = Map.of(
-                "model", "gpt-4o-mini-2024-07-18",
-                "temperature", 0.8,
-                "messages", List.of(
-                        Map.of("role", "system", "content", "Você é uma IA da FURIA que entende profundamente sobre fãs e jogos."),
-                        Map.of("role", "user", "content", prompt)
-                )
-        );
-
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        try {
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    requestEntity,
-                    Map.class
-            );
-
-            Map responseBody = response.getBody();
-            if (responseBody != null) {
-                var choices = (List<Map<String, Object>>) responseBody.get("choices");
-                if (choices != null && !choices.isEmpty()) {
-                    var message = (Map<String, Object>) choices.get(0).get("message");
-                    return (String) message.get("content");
-                }
-            }
-
-            return "[Erro] A resposta da IA veio vazia.";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "[Erro] Falha ao gerar perfil via OpenAI.";
-        }
+    interface GptAssistant {
+        String chat(String userMessage);
     }
 }

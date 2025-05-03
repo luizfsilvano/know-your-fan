@@ -6,6 +6,7 @@ import com.furia.knowyourfan.web.dto.SigninRequest;
 import com.furia.knowyourfan.web.dto.SignupRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,9 +26,8 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public AuthResponse signin(@RequestBody @Valid SigninRequest request)
-    {
-        return authService.authenticateUser(request);
+    public ResponseEntity<AuthResponse> signin(@Valid @RequestBody SigninRequest request) {
+        return ResponseEntity.ok(authService.authenticateUser(request));
     }
 
 }
