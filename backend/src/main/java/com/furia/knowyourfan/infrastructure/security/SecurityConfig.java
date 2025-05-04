@@ -21,7 +21,7 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/error", "/favicon.ico").permitAll()
+                        .requestMatchers("/api/auth/**", "/error", "/favicon.ico").permitAll()
                         .requestMatchers("/api/v1/fan-profile/**").authenticated()
                         .anyRequest().authenticated()
                 )
