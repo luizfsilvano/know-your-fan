@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: know_your_fan_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - know-your-fan-network
+
+  backend:
+    build: ./backend
+    container_name: know_your_fan_backend
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    networks:
+      - know-your-fan-network
+
+volumes:
+  postgres_data:
+
+networks:
+  know-your-fan-network:
