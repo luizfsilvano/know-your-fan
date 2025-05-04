@@ -15,6 +15,9 @@ This repository contains the complete solution for the second technical challeng
 **Live Backend:**
 [https://know-your-fan-h9ay.onrender.com](https://know-your-fan-h9ay.onrender.com)
 
+**Backend documentation**
+[https://documenter.getpostman.com/view/32846088/2sB2j68pji](https://documenter.getpostman.com/view/32846088/2sB2j68pji)
+
 ---
 
 ## Frontend Overview
