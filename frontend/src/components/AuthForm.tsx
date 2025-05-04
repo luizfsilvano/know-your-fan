@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 interface AuthFormProps {
   mode: "login" | "signup";
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function AuthForm({ mode }: AuthFormProps) {
+export default function AuthForm({ mode, setIsLoading }: AuthFormProps) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const res =
         mode === "signup"
@@ -30,6 +32,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
       } else {
         setError("Something went wrong. Please try again.");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,7 +75,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         {mode === "signup" ? "Create Account" : "Login"}
       </button>
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm text-center">{error}</p>}
     </form>
   );
 }
